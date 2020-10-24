@@ -2,12 +2,15 @@ package com.devbueno.libraryapi.resource;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Optional;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -39,6 +42,9 @@ public class BookControllerTest {
 
 	@MockBean
 	BookService bookService;
+	
+	@Autowired
+	ModelMapper modelMapper;
 
 	@Test
 	@DisplayName("deve salvar um livro com sucesso!")
@@ -96,6 +102,39 @@ public class BookControllerTest {
 		.andExpect(MockMvcResultMatchers.jsonPath("errors[0]").value(msgError));
 
 	}
+	
+	@Test
+	@DisplayName("Deve retornar um  livro por id dado que existe") 
+	public void deveRetornaUmLivroPorId() throws Exception {
+		// cenário
+		Book book = modelMapper.map(createNewBook(), Book.class) ;
+		book.setId(10l);
+	    BDDMockito.given(bookService.findById(book.getId())).willReturn(Optional.of(book));
+	    MockHttpServletRequestBuilder  request = MockMvcRequestBuilders.get(BOOK_API.concat("/")+book.getId())
+	    		.accept(MediaType.APPLICATION_JSON);
+	    
+	  
+	    // execução e verificação
+	    mvc.perform(request)
+	    .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
+	    .andExpect(MockMvcResultMatchers.jsonPath("id").value(book.getId()))
+	    .andExpect(MockMvcResultMatchers.status().isOk());
+				
+	}
+	
+	@Test
+	@DisplayName("Deve retorna status code 404  quando nao existir um livro para o ID informado")
+	public void recuperaLivroPorId() throws Exception {
+		// cenário
+		BDDMockito.given(bookService.findById(Mockito.anyLong())).willReturn(Optional.empty());
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get(BOOK_API.concat("/")+12l)
+				.accept(MediaType.APPLICATION_JSON);
+		
+		//execução e verificação
+		mvc.perform(request)
+		.andExpect(MockMvcResultMatchers.status().isNotFound());
+	}
+	
 	
 	private BookDTO createNewBook() {
 		return BookDTO.builder().author("T. Harv Eker").title("Os segredos da mente milionária").isbn("001").build();

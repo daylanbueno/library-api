@@ -44,7 +44,6 @@ public class BookRepositoryTest {
 	public void deveRetornaFalsoQuandoBookIsbnNaoExistir() {
 		// cenário
 		String isbn = "123";
-		Book newBook = createBook(isbn);
 		// execução
 		boolean bookExiste = bookRepostiroy.existsByIsbn(isbn);
 		
