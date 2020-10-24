@@ -135,6 +135,35 @@ public class BookControllerTest {
 		.andExpect(MockMvcResultMatchers.status().isNotFound());
 	}
 	
+	@Test
+	@DisplayName("Deve deletar um livro") 
+	public void deletarLivroExistente() throws Exception {
+		// Cenário 
+		BDDMockito.given(bookService.findById(Mockito.anyLong())).willReturn(Optional.of(Book.builder().id(10l).build()));
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete(BOOK_API.concat("/")+10l)
+				.accept(MediaType.APPLICATION_JSON);
+		
+		//execução e verificação
+		mvc.perform(request)
+		.andExpect(MockMvcResultMatchers.status().isNoContent());
+
+	}
+	
+	@Test
+	@DisplayName("Deve lanca exception quando tentar deletar um livro inexistente!") 
+	public void deletarLivroInexistente() throws Exception {
+		// Cenário 
+		BDDMockito.given(bookService.findById(Mockito.anyLong())).willReturn(Optional.empty());
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete(BOOK_API.concat("/")+10l)
+				.accept(MediaType.APPLICATION_JSON);
+		
+		//execução e verificação
+		mvc.perform(request)
+		.andExpect(MockMvcResultMatchers.status().isNotFound());
+
+	}
 	
 	private BookDTO createNewBook() {
 		return BookDTO.builder().author("T. Harv Eker").title("Os segredos da mente milionária").isbn("001").build();

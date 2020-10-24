@@ -13,12 +13,10 @@ import com.devbueno.libraryapi.service.BookService;
 public class BookServiceImpl implements BookService {
 
 	BookRepostiroy  bookRepository;
-	
-	
+		
 	public BookServiceImpl(BookRepostiroy bookRepository) {
 		this.bookRepository = bookRepository;
 	}
-
 
 	@Override
 	public Book save(Book book) {
@@ -28,11 +26,13 @@ public class BookServiceImpl implements BookService {
 		return bookRepository.save(book);
 	}
 
-
 	@Override
 	public Optional<Book> findById(Long id) {
-		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void delete(long anyLong) {
 	}
 
 }

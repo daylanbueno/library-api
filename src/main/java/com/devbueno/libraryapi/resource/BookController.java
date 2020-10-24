@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,13 +30,11 @@ import com.devbueno.libraryapi.service.BookService;
 @RequestMapping("/api/books")
 public class BookController {
 
-	
 	@Autowired
 	BookService servico;
 	
 	@Autowired
 	ModelMapper modelMapper;
-	
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
@@ -49,6 +48,13 @@ public class BookController {
 		return servico.findById(id)
 				.map(book -> modelMapper.map(book, BookDTO.class))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+	}
+	
+	@DeleteMapping("/{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void delete(@PathVariable Long id) {
+		Book entity = servico.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		servico.delete(entity.getId());		
 	}
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
