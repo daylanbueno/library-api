@@ -10,6 +10,7 @@ public interface BookService {
 
 	Optional<Book> findById(Long id);
 
-	void delete(long anyLong);
+	void delete(Book book);
 
+    Book update(Book entity);
 }

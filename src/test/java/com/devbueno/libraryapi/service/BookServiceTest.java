@@ -17,6 +17,8 @@ import com.devbueno.libraryapi.model.entity.Book;
 import com.devbueno.libraryapi.model.repository.BookRepostiroy;
 import com.devbueno.libraryapi.service.impl.BookServiceImpl;
 
+import java.util.Optional;
+
 @ExtendWith(SpringExtension.class) // criar context spring
 @ActiveProfiles("test") // subindo profile de test
 public class BookServiceTest {
@@ -65,6 +67,36 @@ public class BookServiceTest {
 
 		Mockito.verify(bookRepostiroy, Mockito.never()).save(book);
 	}
+
+	@Test
+	@DisplayName("deve retorna um livro dado que o mesmo existe na base")
+	public void deveRetornaUmLivroSeExiste() {
+		// cenário
+		Book book = createNewValidBook();
+		book.setId(12l);
+		Mockito.when(bookRepostiroy.findById(Mockito.anyLong())).thenReturn(Optional.of(book));
+
+		// execução
+		Book newbook = bookRepostiroy.findById(12l).get();
+
+		assertThat(newbook.getId()).isNotNull();
+		assertThat(newbook.getAuthor()).isEqualTo("Marcos");
+		assertThat(newbook.getTitle()).isEqualTo("Java em um dia");
+	}
+
+	@Test
+	@DisplayName("deve retorna vazio se quando o livro nao existe")
+	public void deveRetornaVazioQuandoOLivroNaoExiste() {
+		// cenário
+		Mockito.when(bookRepostiroy.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+
+		// execução
+		Optional<Book> newbook = bookRepostiroy.findById(12l);
+
+		// verificação
+		assertThat(newbook.isPresent()).isFalse();
+	}
+
 
 	private Book createNewValidBook() {
 		return Book.builder().author("Marcos").isbn("123").title("Java em um dia").build();

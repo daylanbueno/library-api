@@ -13,7 +13,7 @@ import com.devbueno.libraryapi.service.BookService;
 public class BookServiceImpl implements BookService {
 
 	BookRepostiroy  bookRepository;
-		
+
 	public BookServiceImpl(BookRepostiroy bookRepository) {
 		this.bookRepository = bookRepository;
 	}
@@ -28,11 +28,17 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public Optional<Book> findById(Long id) {
-		return null;
+		return bookRepository.findById(id);
 	}
 
 	@Override
-	public void delete(long anyLong) {
+	public void delete(Book book) {
+		bookRepository.delete(book);
+	}
+
+	@Override
+	public Book update(Book entity) {
+		return null;
 	}
 
 }
