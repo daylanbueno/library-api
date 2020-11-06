@@ -147,6 +147,25 @@ public class BookServiceTest {
 		Mockito.verify(bookRepostiroy, Mockito.never()).save(book);
 	}
 
+	@Test
+	@DisplayName("Deve atualizar um livro")
+	public void deveAtualizarLivro() {
+		//cenário
+		Book book = Book.builder().id(1l).build();
+		Book updatingBook  = Book.builder().id(1l).title("titulo").isbn("123").author("Marcos").build();
+		Mockito.when(bookRepostiroy.save(book)).thenReturn(updatingBook);
+
+		//execução
+		Book updatedBook = bookService.update(book);
+
+		//verificação
+		assertThat(updatedBook).isNotNull();
+		assertThat(updatedBook.getTitle()).isEqualTo(updatingBook.getTitle());
+		assertThat(updatedBook.getId()).isEqualTo(updatingBook.getId());
+		assertThat(updatedBook.getAuthor()).isEqualTo(updatingBook.getAuthor());
+		assertThat(updatedBook.getIsbn()).isEqualTo(updatingBook.getIsbn());
+	}
+
 
 	private Book createNewValidBook() {
 		return Book.builder().author("Marcos").isbn("123").title("Java em um dia").build();
