@@ -68,6 +68,53 @@ public class BookRepositoryTest {
 		Assertions.assertThat(foundBook.isPresent()).isTrue();
 	}
 
+	@Test
+	@DisplayName("deve deletar um livro dado que existe")
+	public void deveDeletarUmLivroSeExiste() {
+		// cenario
+		Book book = createBook("123");
+		entityManager.persist(book);
+
+		//execuçao
+		bookRepostiroy.delete(book);
+		Optional<Book> foundBook = bookRepostiroy.findById(book.getId());
+
+		// verificão
+		Assertions.assertThat(foundBook.isPresent()).isFalse();
+	}
+
+	@Test
+	@DisplayName("deve salvar um livro")
+	public void salvaLivroValido() {
+		// cenário
+		Book book = createBook("123");
+
+		// execução
+		Book newBook = bookRepostiroy.save(book);
+
+		// verificação
+		Assertions.assertThat(newBook.getId()).isNotNull();
+
+	}
+
+	@Test
+	@DisplayName("deve alterar um livro")
+	public void updateBookTest() {
+		// cenário
+		Book book = createBook("123");
+		entityManager.persist(book);
+
+		Book bookUpdating = bookRepostiroy.findById(book.getId()).get();
+		bookUpdating.setAuthor("DAILAN BUENO");
+		// execução
+		Book bookUpdated = bookRepostiroy.save(bookUpdating);
+
+		//verificação
+		Assertions.assertThat(bookUpdated.getAuthor()).isEqualTo("DAILAN BUENO");
+
+	}
+
+
 	private Book createBook(String isbn) {
 		return Book.builder().author("DAINEL GOLEMAN").title("INTELIGÊNCIA EMOCIONAL").isbn(isbn).build();
 	}
