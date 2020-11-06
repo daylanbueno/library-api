@@ -33,12 +33,18 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public void delete(Book book) {
+		if (book == null || book.getId() == null) {
+			throw new IllegalArgumentException("Erro ao deletar um livro que não existe");
+		}
 		bookRepository.delete(book);
 	}
 
 	@Override
 	public Book update(Book entity) {
-		return null;
+		if (entity == null || entity.getId() == null) {
+			throw new IllegalArgumentException("Erro: o livro não existe existe");
+		}
+		return bookRepository.save(entity);
 	}
 
 }

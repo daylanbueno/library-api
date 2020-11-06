@@ -97,6 +97,56 @@ public class BookServiceTest {
 		assertThat(newbook.isPresent()).isFalse();
 	}
 
+	@Test
+	@DisplayName("Deve deletar um livro dado que exite")
+	public void deveDeletarUmLivroQuandoExistir() {
+		// cenário
+		Book book = Book.builder().author("Marcos").isbn("123").id(100l).title("Java em um dia").build();
+
+		//execução
+		org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> bookService.delete(book));
+
+		Mockito.verify(bookRepostiroy, Mockito.times(1)).delete(book);
+	}
+
+	@Test
+	@DisplayName("Deve ocorrer um error quando tentar deletar um livro inexistente.")
+	public void deletarLivroQueNaoExiste() {
+		// cenário
+		Book book = new Book();
+		// execução
+		org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () ->bookService.delete(book));
+
+		// verificação
+		Mockito.verify(bookRepostiroy, Mockito.never()).delete(book);
+	}
+
+	@Test
+	@DisplayName("Deve atualizar o livro dado que o mesmo existe")
+	public void deveAtualizarLivroDadoQueExiste() {
+		// cenário
+		Book book = Book.builder().id(12l).author("dailan").isbn("001").title("Java em 1 dia").build();
+
+		//execução
+		org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> bookService.update(book));
+
+		//verificação
+		Mockito.verify(bookRepostiroy, Mockito.times(1)).save(book);
+	}
+
+	@Test
+	@DisplayName("Deve lança um erro se o livro não existir.")
+	public void deveLancaErroAoAtualizarLivroQuandoNaoExistir() {
+		// cenário
+		Book book = new Book();
+
+		//execução
+		org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> bookService.update(book));
+
+		//verificação
+		Mockito.verify(bookRepostiroy, Mockito.never()).save(book);
+	}
+
 
 	private Book createNewValidBook() {
 		return Book.builder().author("Marcos").isbn("123").title("Java em um dia").build();
