@@ -2,6 +2,8 @@ package com.devbueno.libraryapi.service.impl;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.devbueno.libraryapi.exceptions.BusinessException;
@@ -45,6 +47,11 @@ public class BookServiceImpl implements BookService {
 			throw new IllegalArgumentException("Erro: o livro não existe existe");
 		}
 		return bookRepository.save(entity);
+	}
+
+	@Override
+	public Page<Book> findByFilter(Book any, Pageable any1) {
+		return null;
 	}
 
 }

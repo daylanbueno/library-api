@@ -1,10 +1,10 @@
 package com.devbueno.libraryapi.resource;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.Optional;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.devbueno.libraryapi.dto.BookDTO;
+import com.devbueno.libraryapi.exceptions.BusinessException;
+import com.devbueno.libraryapi.model.entity.Book;
+import com.devbueno.libraryapi.service.BookService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,8 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,11 +27,10 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import com.devbueno.libraryapi.dto.BookDTO;
-import com.devbueno.libraryapi.exceptions.BusinessException;
-import com.devbueno.libraryapi.model.entity.Book;
-import com.devbueno.libraryapi.service.BookService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
+import java.util.Optional;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -219,6 +220,35 @@ public class BookControllerTest {
         mvc.perform(request)
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
+
+    @Test
+    @DisplayName("Deve recuperar livros por paramentros")
+    public void findBookByFilter() throws Exception {
+        // cenário
+        Long id = 1l;
+        Book book = Book.builder()
+                .id(id)
+                .title(createNewBook().getTitle())
+                .author(createNewBook().getAuthor())
+                .isbn(createNewBook().getIsbn()).build();
+
+        BDDMockito.given(bookService.findByFilter(Mockito.any(Book.class), Mockito.any(Pageable.class)))
+                .willReturn(new PageImpl<Book>(Arrays.asList(book), PageRequest.of(0, 10), 1));
+
+        // execução
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(BOOK_API.concat("?title=os&author=T.&page=0&size=10"))
+                .accept(MediaType.APPLICATION_JSON);
+
+        // verificação
+        mvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect( MockMvcResultMatchers.jsonPath("content",Matchers.hasSize(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("totalElements").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("pageable.pageSize").value(10))
+                .andExpect(MockMvcResultMatchers.jsonPath("pageable.pageNumber").value(0));
+    }
+
 
     private BookDTO createNewBook() {
         return BookDTO.builder().author("T. Harv Eker").title("Os segredos da mente milionária").isbn("001").build();

@@ -4,6 +4,9 @@ import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -16,6 +19,8 @@ import com.devbueno.libraryapi.exceptions.BusinessException;
 import com.devbueno.libraryapi.model.entity.Book;
 import com.devbueno.libraryapi.service.BookService;
 
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -58,6 +63,21 @@ public class BookController {
 			entity = servico.update(entity);
 			return modelMapper.map(entity, BookDTO.class);
 		}).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+	}
+
+	@GetMapping
+	public Page<BookDTO> findByFilter(BookDTO dto, Pageable pageRequest) {
+		Book filter = modelMapper.map(dto, Book.class);
+		Page<Book> result = servico.findByFilter(filter, pageRequest);
+
+		List<BookDTO> list = result.getContent().stream().map(entity -> modelMapper.map(entity, BookDTO.class))
+				.collect(Collectors.toList());
+
+		return new PageImpl<>(
+				list,
+				pageRequest,
+				result.getTotalElements()
+		);
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
