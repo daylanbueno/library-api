@@ -7,8 +7,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.boot.ImageBanner;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -17,6 +23,8 @@ import com.devbueno.libraryapi.model.entity.Book;
 import com.devbueno.libraryapi.model.repository.BookRepostiroy;
 import com.devbueno.libraryapi.service.impl.BookServiceImpl;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(SpringExtension.class) // criar context spring
@@ -166,6 +174,25 @@ public class BookServiceTest {
 		assertThat(updatedBook.getIsbn()).isEqualTo(updatingBook.getIsbn());
 	}
 
+	@Test
+	@DisplayName("deve filtrar um livro com sucesso dado os parametros")
+	public void findBookByFilter() {
+		// cenário
+		Book book = createNewValidBook();
+		PageRequest pageRequest = PageRequest.of(0, 10);
+		List<Book> bookList = Arrays.asList(book);
+		Page<Book> page = new PageImpl<>(bookList, pageRequest,  1);
+		Mockito.when(bookRepostiroy.findAll(Mockito.any(Example.class),Mockito.any(PageRequest.class))).thenReturn(page);
+
+		// execução
+	 	Page<Book> result =	bookService.findByFilter(book, pageRequest);
+
+	 	//verificação
+		assertThat(result.getTotalElements()).isEqualTo(1);
+		assertThat(result.getContent()).isEqualTo(bookList);
+		assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
+		assertThat(result.getPageable().getPageSize()).isEqualTo(10);
+	}
 
 	private Book createNewValidBook() {
 		return Book.builder().author("Marcos").isbn("123").title("Java em um dia").build();

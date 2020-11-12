@@ -1,10 +1,10 @@
 package com.devbueno.libraryapi.service;
 
-import java.util.Optional;
-
 import com.devbueno.libraryapi.model.entity.Book;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+
+import java.util.Optional;
 
 public interface BookService {
 
@@ -16,5 +16,5 @@ public interface BookService {
 
     Book update(Book entity);
 
-	Page<Book> findByFilter(Book any, Pageable pageable);
+	Page<Book> findByFilter(Book any, PageRequest pageRequest);
 }

@@ -2,8 +2,7 @@ package com.devbueno.libraryapi.service.impl;
 
 import java.util.Optional;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import com.devbueno.libraryapi.exceptions.BusinessException;
@@ -50,8 +49,16 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public Page<Book> findByFilter(Book any, Pageable any1) {
-		return null;
+	public Page<Book> findByFilter(Book filter, PageRequest pageRequest) {
+		Example<Book> example = Example.of(
+				filter,
+				ExampleMatcher
+						.matching()
+						.withIgnoreCase()
+						.withIgnoreNullValues()
+						.withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)
+		);
+		return bookRepository.findAll(example, pageRequest);
 	}
 
 }

@@ -232,7 +232,7 @@ public class BookControllerTest {
                 .author(createNewBook().getAuthor())
                 .isbn(createNewBook().getIsbn()).build();
 
-        BDDMockito.given(bookService.findByFilter(Mockito.any(Book.class), Mockito.any(Pageable.class)))
+        BDDMockito.given(bookService.findByFilter(Mockito.any(Book.class), Mockito.any(PageRequest.class)))
                 .willReturn(new PageImpl<Book>(Arrays.asList(book), PageRequest.of(0, 10), 1));
 
         // execução
