@@ -17,4 +17,6 @@ public interface BookService {
     Book update(Book entity);
 
 	Page<Book> findByFilter(Book any, PageRequest pageRequest);
+
+	Optional findBookByIsbn(String isbn);
 }
