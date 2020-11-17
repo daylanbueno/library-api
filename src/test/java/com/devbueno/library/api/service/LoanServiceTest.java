@@ -105,6 +105,25 @@ public class LoanServiceTest {
         assertThat(loanSaved.get().getCustomer()).isEqualTo(loan.getCustomer());
     }
 
+    @Test
+    @DisplayName("deve atualizar o emprestimo  para retornado ")
+    public void updateLoanTest() {
+        // cenário
+        Loan loanSaving = createNewLoan();
+        Loan mockLoanUpdated = createNewLoan();
+        mockLoanUpdated.setId(10l);
+        mockLoanUpdated.setReturned(true);
+        Mockito.when(loanRepository.save(loanSaving)).thenReturn(mockLoanUpdated);
+
+        // execução
+        Loan loanUpdated = service.update(loanSaving);
+
+        // verifição;
+        assertThat(loanUpdated.getId()).isNotNull();
+        assertThat(loanUpdated.getCustomer()).isEqualTo(mockLoanUpdated.getCustomer());
+        assertThat(loanUpdated.getReturned()).isEqualTo(mockLoanUpdated.getReturned());
+    }
+
 
 
 
