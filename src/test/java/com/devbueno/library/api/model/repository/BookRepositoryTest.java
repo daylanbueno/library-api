@@ -30,7 +30,7 @@ public class BookRepositoryTest {
 	public void deveRetornaVerdadeiroQuandoBookIsbnExistir() {
 		// cenário
 		String isbn = "123";
-		Book newBook = createBook(isbn);
+		Book newBook = createNewBook(isbn);
 		entityManager.persist(newBook);
 		// execução
 		boolean bookExiste = bookRepostiroy.existsByIsbn(isbn);
@@ -57,7 +57,7 @@ public class BookRepositoryTest {
 	@DisplayName("deve obter um livro por id")
 	public void deveObterUmLivroPorId() {
 		// cenário
-		Book book = createBook("123");
+		Book book = createNewBook("123");
 		entityManager.persist(book);
 
 		// execução.
@@ -71,7 +71,7 @@ public class BookRepositoryTest {
 	@DisplayName("deve deletar um livro dado que existe")
 	public void deveDeletarUmLivroSeExiste() {
 		// cenario
-		Book book = createBook("123");
+		Book book = createNewBook("123");
 		entityManager.persist(book);
 
 		//execuçao
@@ -86,7 +86,7 @@ public class BookRepositoryTest {
 	@DisplayName("deve salvar um livro")
 	public void salvaLivroValido() {
 		// cenário
-		Book book = createBook("123");
+		Book book = createNewBook("123");
 
 		// execução
 		Book newBook = bookRepostiroy.save(book);
@@ -100,7 +100,7 @@ public class BookRepositoryTest {
 	@DisplayName("deve alterar um livro")
 	public void updateBookTest() {
 		// cenário
-		Book book = createBook("123");
+		Book book = createNewBook("123");
 		entityManager.persist(book);
 
 		Book bookUpdating = bookRepostiroy.findById(book.getId()).get();
@@ -114,7 +114,7 @@ public class BookRepositoryTest {
 	}
 
 
-	private Book createBook(String isbn) {
+	public static Book createNewBook(String isbn) {
 		return Book.builder().author("DAINEL GOLEMAN").title("INTELIGÊNCIA EMOCIONAL").isbn(isbn).build();
 	}
 }
