@@ -15,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -39,12 +40,7 @@ public class LoanServiceTest {
     @DisplayName("deve salvar um emprestimo com sucesso")
     public void saveLoanTest() {
         // cenário
-        Book book = Book.builder().id(1l).build();
-        Loan loanSaving = Loan.builder()
-                .customer("Eduardo")
-                .book(book)
-                .loanDate(LocalDate.now())
-                .build();
+        Loan loanSaving = createNewLoan();
 
         Loan loanSaved = Loan.builder()
                 .customer("Eduardo")
@@ -53,7 +49,7 @@ public class LoanServiceTest {
                 .loanDate(LocalDate.now())
                 .build();
 
-        Mockito.when(loanRepository.existsByBookAndNotReturned(book)).thenReturn(false);
+        Mockito.when(loanRepository.existsByBookAndNotReturned(loanSaving.getBook())).thenReturn(false);
         Mockito.when(loanRepository.save(loanSaving)).thenReturn(loanSaved);
 
         // execução
@@ -70,11 +66,7 @@ public class LoanServiceTest {
     public void loanedBookSaveTest() {
         // cenário
         Book book = Book.builder().id(1l).build();
-        Loan loanSaving = Loan.builder()
-                .customer("Eduardo")
-                .book(book)
-                .loanDate(LocalDate.now())
-                .build();
+        Loan loanSaving = createNewLoan();
 
         Mockito.when(loanRepository.existsByBookAndNotReturned(book)).thenReturn(true);
 
@@ -85,6 +77,35 @@ public class LoanServiceTest {
         assertThat(exception).isInstanceOf(BusinessException.class)
                 .hasMessage("Book already loaned!");
     }
+
+    private Loan createNewLoan() {
+        Book book = Book.builder().id(1l).build();
+        return Loan.builder()
+                .customer("Eduardo")
+                .book(book)
+                .loanDate(LocalDate.now())
+                .build();
+    }
+
+    @Test
+    @DisplayName("deve obter LOAN por ID")
+    public void loanByIdTest() {
+        // cenário
+        Long id = 1l;
+        Loan loan = createNewLoan();
+        loan.setId(id);
+        Mockito.when(loanRepository.findById(id)).thenReturn(Optional.of(loan));
+
+        // execução
+        Optional<Loan> loanSaved = service.findById(id);
+
+        // verifição
+        assertThat(loanSaved.isPresent()).isTrue();
+        assertThat(loanSaved.get().getId()).isEqualTo(id);
+        assertThat(loanSaved.get().getCustomer()).isEqualTo(loan.getCustomer());
+    }
+
+
 
 
 }

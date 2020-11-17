@@ -1,6 +1,7 @@
 package com.devbueno.library.api.resource;
 
 import com.devbueno.library.api.dto.LoanDto;
+import com.devbueno.library.api.dto.ReturnedLoanDto;
 import com.devbueno.library.api.exceptions.BusinessException;
 import com.devbueno.library.api.service.BookService;
 import com.devbueno.library.api.model.entity.Book;
@@ -21,9 +22,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -117,7 +120,52 @@ public class LoanControllerTest {
               //  .andExpect( jsonPath("errors[0]").value("Book already loaned!") );
     }
 
+    @Test
+    @DisplayName("deve atualizas status de um livro devolvido")
+    public void returnedLoadTest() throws Exception{
+        // cenário { returned: true }
+        ReturnedLoanDto dto = ReturnedLoanDto.builder().returned(true).build();
+        String json = new ObjectMapper().writeValueAsString(dto);
 
+        Loan loan = Loan.builder().book(Book.builder().id(1l).build()).id(1l).returned(false).build();
+
+        BDDMockito.given(loanService.findById(1l)).willReturn(Optional.of(loan));
+        MockHttpServletRequestBuilder request =
+                MockMvcRequestBuilders.patch(LOAN_API.concat("/1"))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        // execução
+        ResultActions perform = mvc.perform(request);
+
+        // verificação
+        perform.andExpect(status().isOk());
+        Mockito.verify(loanService, Mockito.times(1)).update(loan);
+    }
+
+    @Test
+    @DisplayName("deve devolver 404 ao tentar atualizar status de livro inexistente.")
+    public void returnedBookEnexistente() throws Exception {
+        // cenário { returned: true }
+        ReturnedLoanDto dto = ReturnedLoanDto.builder().returned(true).build();
+        String json = new ObjectMapper().writeValueAsString(dto);
+
+        BDDMockito.given(loanService.findById(1l)).willReturn(Optional.empty());
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch(LOAN_API.concat("/1"))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        // execução
+        ResultActions perform = mvc.perform(request);
+
+        // verificação
+        perform.andExpect(status().isNotFound());
+        Mockito.verify(loanService, Mockito.never()).update(Mockito.any());
+
+    }
     private Book getNewBook() {
         return Book.builder().id(1l).build();
     }

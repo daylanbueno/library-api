@@ -1,6 +1,7 @@
 package com.devbueno.library.api.resource;
 
 import com.devbueno.library.api.dto.LoanDto;
+import com.devbueno.library.api.dto.ReturnedLoanDto;
 import com.devbueno.library.api.model.entity.Book;
 import com.devbueno.library.api.model.entity.Loan;
 import com.devbueno.library.api.service.BookService;
@@ -38,4 +39,12 @@ public class LoanController {
         return loanSaved.getId();
     }
 
+
+    @PatchMapping("{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void returnedBook(@PathVariable Long id, @RequestBody ReturnedLoanDto returnedLoanDto) {
+        Loan loan = service.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        loan.setReturned(returnedLoanDto.getReturned());
+        service.update(loan);
+    }
 }
