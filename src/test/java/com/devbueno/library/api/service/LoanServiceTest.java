@@ -78,7 +78,7 @@ public class LoanServiceTest {
                 .hasMessage("Book already loaned!");
     }
 
-    private Loan createNewLoan() {
+    public static  Loan createNewLoan() {
         Book book = Book.builder().id(1l).build();
         return Loan.builder()
                 .customer("Eduardo")

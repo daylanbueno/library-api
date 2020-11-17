@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -25,11 +27,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import javax.swing.text.html.Option;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Optional;
 
+import static com.devbueno.library.api.service.LoanServiceTest.createNewLoan;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
@@ -164,8 +169,36 @@ public class LoanControllerTest {
         // verificação
         perform.andExpect(status().isNotFound());
         Mockito.verify(loanService, Mockito.never()).update(Mockito.any());
-
     }
+
+    @Test
+    @DisplayName("deve recupear  Loan por filtro")
+    public void findLoanByFilter() throws Exception {
+        // cenário
+        Loan loan = createNewLoan();
+        loan.setId(1l);
+        loan.getBook().setIsbn("123");
+        BDDMockito.given(loanService.findByFilter(Mockito.any(Loan.class), Mockito.any(PageRequest.class)))
+                .willReturn(new PageImpl<Loan>(Arrays.asList(loan), PageRequest.of(0, 10), 1));
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(LOAN_API.concat("?isbn=123&customer=&page=0&size=10"))
+                .accept(MediaType.APPLICATION_JSON);
+
+        // execução
+        ResultActions perform = mvc.perform(request);
+
+        // verificação
+        perform.andExpect(status().isOk())
+        .andExpect(MockMvcResultMatchers.jsonPath("content", Matchers.hasSize(1)))
+        .andExpect(MockMvcResultMatchers.jsonPath("content[0].id").value(1))
+        .andExpect(MockMvcResultMatchers.jsonPath("content[0].bookDTO.isbn").value("123"))
+        .andExpect(MockMvcResultMatchers.jsonPath("totalElements").value(1))
+        .andExpect(MockMvcResultMatchers.jsonPath("pageable.pageSize").value(10))
+        .andExpect(MockMvcResultMatchers.jsonPath("pageable.pageNumber").value(0));
+    }
+
+
     private Book getNewBook() {
         return Book.builder().id(1l).build();
     }

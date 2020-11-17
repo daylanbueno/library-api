@@ -1,5 +1,6 @@
 package com.devbueno.library.api.resource;
 
+import com.devbueno.library.api.dto.BookDTO;
 import com.devbueno.library.api.dto.LoanDto;
 import com.devbueno.library.api.dto.ReturnedLoanDto;
 import com.devbueno.library.api.model.entity.Book;
@@ -8,11 +9,18 @@ import com.devbueno.library.api.service.BookService;
 import com.devbueno.library.api.service.LoanService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/loans")
@@ -21,6 +29,7 @@ public class LoanController {
 
     private final LoanService service;
     private final BookService bookService;
+    private final ModelMapper modalMapper;
 
     @SneakyThrows
     @PostMapping
@@ -39,6 +48,27 @@ public class LoanController {
         return loanSaved.getId();
     }
 
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public Page<LoanDto> findByFilter(LoanDto loanFilter, Pageable pageRequest) {
+      Loan filter = modalMapper.map(loanFilter, Loan.class);
+      Page<Loan> result = service.findByFilter(filter, pageRequest);
+        List<LoanDto> loans = result.getContent().stream()
+                .map(entity -> {
+
+                    Book book = entity.getBook();
+                    BookDTO bookDto = modalMapper.map(book, BookDTO.class);
+                    LoanDto loanDto = modalMapper.map(entity, LoanDto.class);
+                    loanDto.setBookDTO(bookDto);
+                    return loanDto;
+
+                }).collect(Collectors.toList());
+        return new PageImpl<LoanDto>(
+                loans,
+                pageRequest,
+                result.getTotalElements()
+        );
+    }
 
     @PatchMapping("{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -47,4 +77,6 @@ public class LoanController {
         loan.setReturned(returnedLoanDto.getReturned());
         service.update(loan);
     }
+
+
 }
