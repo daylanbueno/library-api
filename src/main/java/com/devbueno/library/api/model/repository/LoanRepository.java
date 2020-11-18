@@ -12,13 +12,13 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LoanRepository extends JpaRepository<Loan, Long> {
+
     Loan save(Loan loanSaving);
 
     @Query(value = " select case when (count (l.id) > 0) then true else false end " +
             " from Loan l where l.book = :book and ( l.returned is null or  l.returned is false )")
     boolean existsByBookAndNotReturned(@Param("book") Book book);
 
-    Loan update(Loan loan);
-
-    Page<Loan> findByBookIsbnOrCustommer(String anyString, String anyString1, Pageable pageable);
+    @Query(value = "select l from Loan as l join l.book as b  where l.customer = :customer or b.isbn = :isbn")
+     Page<Loan> findByBookIsbnOrCustommer(@Param("isbn") String isbn, @Param("customer") String customer, Pageable pageable);
 }

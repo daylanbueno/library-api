@@ -1,6 +1,7 @@
 package com.devbueno.library.api.service;
 
 import com.devbueno.library.api.model.entity.Book;
+import com.devbueno.library.api.model.entity.Loan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -16,7 +17,9 @@ public interface BookService {
 
     Book update(Book entity);
 
-	Page<Book> findByFilter(Book any, Pageable pageRequest);
+	Page<Book> findByFilter(Book book, Pageable pageRequest);
 
 	Optional<Book> findBookByIsbn(String isbn);
+
+	Page<Loan> obterEmprestimosPorLivro(Long id,  Pageable pageRequest);
 }

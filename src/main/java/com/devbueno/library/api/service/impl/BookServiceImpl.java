@@ -3,6 +3,7 @@ package com.devbueno.library.api.service.impl;
 import java.util.Optional;
 
 import com.devbueno.library.api.exceptions.BusinessException;
+import com.devbueno.library.api.model.entity.Loan;
 import com.devbueno.library.api.model.repository.BookRepostiroy;
 import com.devbueno.library.api.service.BookService;
 import org.springframework.data.domain.*;
@@ -64,6 +65,11 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public Optional<Book> findBookByIsbn(String isbn) {
 		return bookRepository.findByIsbn(isbn);
+	}
+
+	@Override
+	public Page<Loan> obterEmprestimosPorLivro(Long codigoLivro, Pageable pageRequest) {
+		return null;
 	}
 
 }

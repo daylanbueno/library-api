@@ -1,15 +1,14 @@
 package com.devbueno.library.api.model.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data // get, set, hascode, equals
 @Builder // construtor
@@ -28,5 +27,8 @@ public class Book {
 	private String author;
 
 	private String isbn;
+
+	@OneToMany(mappedBy = "book")
+	private List<Loan> loans;
 
 }
