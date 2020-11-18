@@ -156,6 +156,7 @@ public class LoanServiceTest {
                 .customer("Eduardo")
                 .book(book)
                 .loanDate(LocalDate.now())
+                .email("customer@gmail.com")
                 .build();
     }
 }

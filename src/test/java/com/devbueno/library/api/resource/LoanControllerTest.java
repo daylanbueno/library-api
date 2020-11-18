@@ -3,9 +3,9 @@ package com.devbueno.library.api.resource;
 import com.devbueno.library.api.dto.LoanDto;
 import com.devbueno.library.api.dto.ReturnedLoanDto;
 import com.devbueno.library.api.exceptions.BusinessException;
-import com.devbueno.library.api.service.BookService;
 import com.devbueno.library.api.model.entity.Book;
 import com.devbueno.library.api.model.entity.Loan;
+import com.devbueno.library.api.service.BookService;
 import com.devbueno.library.api.service.LoanService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
@@ -29,7 +29,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Optional;

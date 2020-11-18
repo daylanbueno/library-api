@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Data
@@ -32,4 +34,9 @@ public class Loan {
 
     @Column
     private Boolean returned;
+
+    @Column
+    @NotNull(message = "O email é obrigatório")
+    @NotEmpty(message = "O email é obrigatório")
+    private String email;
 }
