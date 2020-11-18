@@ -1,12 +1,16 @@
 package com.devbueno.library.api.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.devbueno.library.api.model.entity.Loan;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Example;
@@ -110,7 +114,7 @@ public class BookServiceTest {
 		Book book = Book.builder().author("Marcos").isbn("123").id(100l).title("Java em um dia").build();
 
 		//execução
-		org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> bookService.delete(book));
+		assertDoesNotThrow(() -> bookService.delete(book));
 
 		Mockito.verify(bookRepostiroy, Mockito.times(1)).delete(book);
 	}
@@ -121,7 +125,7 @@ public class BookServiceTest {
 		// cenário
 		Book book = new Book();
 		// execução
-		org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () ->bookService.delete(book));
+		assertThrows(IllegalArgumentException.class, () ->bookService.delete(book));
 
 		// verificação
 		Mockito.verify(bookRepostiroy, Mockito.never()).delete(book);
@@ -134,7 +138,7 @@ public class BookServiceTest {
 		Book book = Book.builder().id(12l).author("dailan").isbn("001").title("Java em 1 dia").build();
 
 		//execução
-		org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> bookService.update(book));
+		assertDoesNotThrow(() -> bookService.update(book));
 
 		//verificação
 		Mockito.verify(bookRepostiroy, Mockito.times(1)).save(book);
@@ -147,7 +151,7 @@ public class BookServiceTest {
 		Book book = new Book();
 
 		//execução
-		org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> bookService.update(book));
+		assertThrows(IllegalArgumentException.class, () -> bookService.update(book));
 
 		//verificação
 		Mockito.verify(bookRepostiroy, Mockito.never()).save(book);
@@ -209,6 +213,50 @@ public class BookServiceTest {
 		assertThat(book.get().getIsbn()).isEqualTo(isbn);
 
 		Mockito.verify(bookRepostiroy, Mockito.times(1)).findByIsbn(isbn);
+	}
+
+	@Test
+	@DisplayName("deve recuperar emprestimos de um livro")
+	public void findLoansByBookTest() {
+		//  cenário
+		Book book = createNewValidBook();
+		Loan loan = Loan.builder().id(1l).customer("fulano").build();
+		book.setLoans(Arrays.asList(loan));
+		book.setId(1l);
+
+		Mockito.when(bookRepostiroy.findById(book.getId())).
+				thenReturn(Optional.of(book));
+
+		Mockito.when(bookRepostiroy.findByBook(book)).
+				thenReturn(new PageImpl<Loan>(Arrays.asList(loan), PageRequest.of(0, 10), 1));
+
+		// execução
+		Page<Loan> result = bookService.obterEmprestimosPorLivro(1l, PageRequest.of(0, 10));
+
+		assertThat(result.getContent()).hasSize(1);
+		assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
+		assertThat(result.getPageable().getPageSize()).isEqualTo(10);
+		assertThat(result.getTotalElements()).isEqualTo(1);
+	}
+
+	@Test
+	@DisplayName("deve lança uma exeption quando não existir um livro")
+	public void findLoanByBookExpectionTest() {
+		//  cenário
+		Book book = createNewValidBook();
+		Loan loan = Loan.builder().id(1l).customer("fulano").build();
+		book.setLoans(Arrays.asList(loan));
+		book.setId(1l);
+
+		Mockito.when(bookRepostiroy.findById(book.getId())).
+				thenReturn(Optional.empty());
+
+		// execução
+		Throwable exception = Assertions.catchThrowable(() -> bookService.obterEmprestimosPorLivro(1l, PageRequest.of(0, 10)));
+
+		// verifição
+		assertThat(exception).isInstanceOf(BusinessException.class).hasMessage("Book not exists!");
+		Mockito.verify(bookRepostiroy, Mockito.never()).findByBook(book);
 	}
 
 	private Book createNewValidBook() {

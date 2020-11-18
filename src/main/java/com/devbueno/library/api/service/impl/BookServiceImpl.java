@@ -69,7 +69,9 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public Page<Loan> obterEmprestimosPorLivro(Long codigoLivro, Pageable pageRequest) {
-		return null;
+		Book book = bookRepository.findById(codigoLivro).
+				orElseThrow(() -> new BusinessException("Book not exists!"));
+		return bookRepository.findByBook(book);
 	}
 
 }
