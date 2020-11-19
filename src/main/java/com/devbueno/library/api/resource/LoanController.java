@@ -7,6 +7,8 @@ import com.devbueno.library.api.model.entity.Book;
 import com.devbueno.library.api.model.entity.Loan;
 import com.devbueno.library.api.service.BookService;
 import com.devbueno.library.api.service.LoanService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.modelmapper.ModelMapper;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/loans")
 @RequiredArgsConstructor
+@Api("API DE LEANS")
 public class LoanController {
 
     private final LoanService service;
@@ -33,6 +36,7 @@ public class LoanController {
     @SneakyThrows
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation("cadastrar um novo emprestimo")
     public Long create(@RequestBody LoanDto loanDto) {
         Book book = (Book) bookService.findBookByIsbn(loanDto.getIsbn())
                 .orElseThrow(() ->
@@ -49,6 +53,7 @@ public class LoanController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
+    @ApiOperation("recupera emprestimos por filtro")
     public Page<LoanDto> findByFilter(LoanDto loanFilter, Pageable pageRequest) {
       Loan filter = modalMapper.map(loanFilter, Loan.class);
       Page<Loan> result = service.findByFilter(filter, pageRequest);
@@ -71,11 +76,11 @@ public class LoanController {
 
     @PatchMapping("{id}")
     @ResponseStatus(HttpStatus.OK)
+    @ApiOperation("atualiza status de emprestimo")
     public void returnedBook(@PathVariable Long id, @RequestBody ReturnedLoanDto returnedLoanDto) {
         Loan loan = service.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         loan.setReturned(returnedLoanDto.getReturned());
         service.update(loan);
     }
-
 
 }
