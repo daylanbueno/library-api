@@ -7,6 +7,8 @@ import com.devbueno.library.api.service.LoanService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 public class LoanServiceImpl implements LoanService {
@@ -38,5 +40,12 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public Page<Loan> findByFilter(Loan loan, Pageable pageRequest) {
         return loanRepository.findByBookIsbnOrCustommer(loan.getBook().getIsbn(),loan.getCustomer(), pageRequest);
+    }
+
+    @Override
+    public List<Loan> getAllLateLoans() {
+        final Integer loanDays = 4;
+        LocalDate threeDayAgo = LocalDate.now().minusDays(loanDays);
+        return loanRepository.findByLoanDateLessThanAndNotReturned(threeDayAgo);
     }
 }

@@ -24,7 +24,6 @@ public class BookRepositoryTest {
 	@Autowired
 	BookRepostiroy bookRepostiroy;
 
-
 	@Test
 	@DisplayName("deve retorna verdadeiro se existir um livro com o codigo isbn")
 	public void deveRetornaVerdadeiroQuandoBookIsbnExistir() {
@@ -32,6 +31,7 @@ public class BookRepositoryTest {
 		String isbn = "123";
 		Book newBook = createNewBook(isbn);
 		entityManager.persist(newBook);
+
 		// execução
 		boolean bookExiste = bookRepostiroy.existsByIsbn(isbn);
 
@@ -45,6 +45,7 @@ public class BookRepositoryTest {
 	public void deveRetornaFalsoQuandoBookIsbnNaoExistir() {
 		// cenário
 		String isbn = "123";
+
 		// execução
 		boolean bookExiste = bookRepostiroy.existsByIsbn(isbn);
 
@@ -112,7 +113,6 @@ public class BookRepositoryTest {
 		Assertions.assertThat(bookUpdated.getAuthor()).isEqualTo("DAILAN BUENO");
 
 	}
-
 
 	public static Book createNewBook(String isbn) {
 		return Book.builder().author("DAINEL GOLEMAN").title("INTELIGÊNCIA EMOCIONAL").isbn(isbn).build();

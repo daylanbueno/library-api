@@ -17,4 +17,6 @@ public interface LoanService {
     Loan update(Loan loan);
 
     Page<Loan> findByFilter(Loan loan, Pageable pageRequest);
+
+    List<Loan> getAllLateLoans();
 }
