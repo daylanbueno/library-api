@@ -4,20 +4,21 @@ import com.devbueno.library.api.exceptions.BusinessException;
 import com.devbueno.library.api.model.entity.Loan;
 import com.devbueno.library.api.model.repository.LoanRepository;
 import com.devbueno.library.api.service.LoanService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+@Service
+@RequiredArgsConstructor
 public class LoanServiceImpl implements LoanService {
 
     private final LoanRepository loanRepository;
 
-    public LoanServiceImpl(LoanRepository loanRepository) {
-        this.loanRepository = loanRepository;
-    }
 
     @Override
     public Loan save(Loan loan) {

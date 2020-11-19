@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.devbueno.library.api.model.entity.Loan;
+import com.devbueno.library.api.model.repository.LoanRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,10 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -38,9 +36,12 @@ public class BookServiceTest {
 	@MockBean // mock de instancia
 	BookRepostiroy bookRepostiroy;
 
+	@MockBean
+	LoanRepository loanRepository;
+
 	@BeforeEach
 	public void setUp() {
-		this.bookService = new BookServiceImpl(bookRepostiroy);
+		this.bookService = new BookServiceImpl(bookRepostiroy, loanRepository);
 	}
 
 	@Test
@@ -227,7 +228,7 @@ public class BookServiceTest {
 		Mockito.when(bookRepostiroy.findById(book.getId())).
 				thenReturn(Optional.of(book));
 
-		Mockito.when(bookRepostiroy.findByBook(book)).
+		Mockito.when(loanRepository.findByBook(book, PageRequest.of(0, 10))).
 				thenReturn(new PageImpl<Loan>(Arrays.asList(loan), PageRequest.of(0, 10), 1));
 
 		// execução
@@ -256,7 +257,7 @@ public class BookServiceTest {
 
 		// verifição
 		assertThat(exception).isInstanceOf(BusinessException.class).hasMessage("Book not exists!");
-		Mockito.verify(bookRepostiroy, Mockito.never()).findByBook(book);
+//		Mockito.verify(bookRepostiroy, Mockito.never()).findByBook(book, PageRequest.of(0, 10));
 	}
 
 	private Book createNewValidBook() {

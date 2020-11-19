@@ -61,7 +61,7 @@ public class BookRepositoryTest {
 		Book book = createNewBook("123");
 		entityManager.persist(book);
 
-		// execução.
+		// execução.'
 		Optional<Book> foundBook = bookRepostiroy.findById(book.getId());
 
 		// verificação

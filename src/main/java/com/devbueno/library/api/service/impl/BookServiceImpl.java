@@ -1,23 +1,28 @@
 package com.devbueno.library.api.service.impl;
 
-import java.util.Optional;
-
 import com.devbueno.library.api.exceptions.BusinessException;
+import com.devbueno.library.api.model.entity.Book;
 import com.devbueno.library.api.model.entity.Loan;
 import com.devbueno.library.api.model.repository.BookRepostiroy;
+import com.devbueno.library.api.model.repository.LoanRepository;
 import com.devbueno.library.api.service.BookService;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.devbueno.library.api.model.entity.Book;
+import java.util.Optional;
 
 @Service
 public class BookServiceImpl implements BookService {
 
 	BookRepostiroy bookRepository;
+	LoanRepository loanRepository;
 
-	public BookServiceImpl(BookRepostiroy bookRepository) {
-		this.bookRepository = bookRepository;
+	public BookServiceImpl(BookRepostiroy bookRepostiroy, LoanRepository loanRepository) {
+		this.bookRepository = bookRepostiroy;
+		this.loanRepository = loanRepository;
 	}
 
 	@Override
@@ -71,7 +76,7 @@ public class BookServiceImpl implements BookService {
 	public Page<Loan> obterEmprestimosPorLivro(Long codigoLivro, Pageable pageRequest) {
 		Book book = bookRepository.findById(codigoLivro).
 				orElseThrow(() -> new BusinessException("Book not exists!"));
-		return bookRepository.findByBook(book);
+		return loanRepository.findByBook(book, pageRequest);
 	}
 
 }
