@@ -16,21 +16,9 @@ import java.util.List;
 @EnableScheduling
 public class LibraryApiApplication {
 
-	@Autowired
-	EmailService emailService;
-
 	@Bean
 	public ModelMapper modelMapper() {
 		return new ModelMapper();
-	}
-
-	@Bean
-	public CommandLineRunner commandLineRunner () {
-		return args -> {
-			List<String> emails = Arrays.asList("book-api-44e708@inbox.mailtrap.io");
-			emailService.sendMails("Olá, seu livro está atrasado! Favor Entrega-lo logo.",emails);
-			System.out.println("SEU EMAIL FOI ENVIADO!");
-		};
 	}
 
 	public static void main(String[] args) {
